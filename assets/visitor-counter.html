@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visitor count</title>
+  <style>
+    html,body { margin:0; padding:0; background:white; color:#63727b; font:14px/1.5 Arial,Helvetica,sans-serif; }
+    a { color:#8a3144; }
+    #provider-output { padding:0 0 4px; }
+    #provider-output img { max-width:100%; height:auto; }
+    #status { margin:4px 0; }
+  </style>
+</head>
+<body>
+  <!-- Original public embed from Yanping Ma's Google Site, kept unchanged. -->
+  <template id="counter-embed">
+    <a href='http://www.freevisitorcounters.com'>more information</a>
+    <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=0f0093541ed91850ffdbaca8de561cc4335375a3'></script>
+    <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1048912/t/0"></script>
+  </template>
+  <div id="provider-output">
+    <script>
+    (() => {
+      const host = window.location.hostname.toLowerCase();
+      const localHost = /^(localhost|0\.0\.0\.0|127(?:\.\d+){3}|10(?:\.\d+){3}|192\.168(?:\.\d+){2}|172\.(?:1[6-9]|2\d|3[01])(?:\.\d+){2}|\[?::1\]?)$/.test(host) || /\.(localhost|local|test)$/.test(host);
+      const publicSite = /^https?:$/.test(window.location.protocol) && host && !localHost;
+      document.getElementById('provider-output').dataset.publicSite = publicSite ? 'yes' : 'no';
+      if (publicSite) document.write(document.getElementById('counter-embed').innerHTML);
+    })();
+    </script>
+  </div>
+  <p id="status" role="status">Loading visitor count…</p>
+  <script>
+  (() => {
+    const publicSite = document.getElementById('provider-output').dataset.publicSite === 'yes';
+    const status = document.getElementById('status');
+    function resize() {
+      parent.postMessage({type:'visitor-counter-size',height:document.body.scrollHeight+4},'*');
+    }
+    if (!publicSite) {
+      status.textContent = 'Shown after publishing';
+    } else {
+      window.addEventListener('load', () => {
+        const output = document.getElementById('provider-output');
+        const images = Array.from(output.querySelectorAll('img'));
+        const hasImage = images.some(image => image.complete && image.naturalWidth > 0);
+        const hasText = /\d/.test(output.innerText);
+        status.textContent = hasImage || hasText ? '' : 'Visitor counter unavailable';
+        resize();
+      });
+    }
+    new ResizeObserver(resize).observe(document.getElementById('provider-output'));
+  })();
+  </script>
+</body>
+</html>
